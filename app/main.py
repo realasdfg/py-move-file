@@ -6,15 +6,18 @@ def move_file(command: str) -> None:
         cm, file_input, file_output = command.strip().split(" ")
     except ValueError:
         return
-
-    file_output_split = file_output.split("/")
-    if len(file_output_split) == 1:
-        os.rename(file_input, file_output_split[0])
+    if cm != "mv":
         return
 
-    file_output_name = file_output_split[-1]
-    file_output_dir = file_output.replace(file_output_name, "")
+    if os.path.dirname(file_output) == "":
+        os.rename(file_input, file_output)
+        return
+
+    file_output_dir = os.path.dirname(file_output)
+    file_output_name = os.path.basename(file_output)
     os.makedirs(file_output_dir, exist_ok=True)
-    with open(file_input, "r") as file_in, open(file_output, "w") as file_out:
+    with (open(file_input, "r") as file_in,
+          open(os.path.join(file_output_dir, file_output_name), "w")
+          as file_out):
         file_out.write(file_in.read())
     os.remove(file_input)
